@@ -9,6 +9,7 @@ import { escapeRegexp } from './common';
 let styles = `
   .ui-select-toggle {
     position: relative;
+    padding-right: 25px;
   }
 
   /* Fix caret going into new line in Firefox */
@@ -104,6 +105,13 @@ let styles = `
       right: 10px;
       margin-top: -2px;
   }
+  .dropdown-item div{
+    white-space: pre-wrap;
+  }
+  .ui-select-match-text{
+    width: 100%;
+    overflow-x: hidden;
+  }
 `;
 
 @Component({
@@ -126,7 +134,7 @@ let styles = `
      class="ui-select-container dropdown open">
     <div [ngClass]="{'ui-disabled': disabled}"></div>
     <div class="ui-select-match"
-         *ngIf="!inputMode">
+         *ngIf="true">
       <span tabindex="-1"
           class="btn btn-default btn-secondary form-control ui-select-toggle"
           (click)="matchClick($event)"
@@ -147,7 +155,7 @@ let styles = `
            (keyup)="inputEvent($event, true)"
            [disabled]="disabled"
            class="form-control ui-select-search"
-           *ngIf="inputMode"
+           *ngIf="false"
            placeholder="{{active.length <= 0 ? placeholder : ''}}">
      <!-- options template -->
      <ul *ngIf="optionsOpened && options && options.length > 0 && !firstItemHasChildren"
@@ -454,7 +462,7 @@ export class SelectComponent implements OnInit, ControlValueAccessor {
 
     this.onTouched();
     if (type === 'selected' || type === 'removed') {
-      this.onChange(this.active);
+      this.onChange(this.active[0].id);
     }
   }
 
@@ -468,7 +476,13 @@ export class SelectComponent implements OnInit, ControlValueAccessor {
   }
 
   public writeValue(val:any):void {
-    this.active = val;
+    let self=this;
+    if(val === undefined || val===null)
+      return;
+    let temp=this._items.filter((item)=>{
+      return item[self.idField]===val;
+    });
+    this.active = temp;
     this.data.emit(this.active);
   }
 
